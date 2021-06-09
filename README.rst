@@ -4,6 +4,13 @@ RC Together
 An asyncio based client library for `RC Together <https://www.rctogether.com>`_. The API
 docs are at: https://docs.rctogether.com
 
+Installation
+------------
+
+You can install using pip::
+
+        pip install rctogether
+
 Authentication
 --------------
 
