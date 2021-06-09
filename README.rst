@@ -1,7 +1,8 @@
 RC Together
 ===========
 
-An asyncio based client library for RC Together. The API docs are at: https://docs.rctogether.com
+An asyncio based client library for `RC Together <https://www.rctogether.com>`_. The API
+docs are at: https://docs.rctogether.com
 
 Authentication
 --------------
@@ -9,7 +10,7 @@ Authentication
 You'll need to generate an app key and secret according to the instructions in the API
 docs: https://docs.rctogether.com/#authentication
 
-Provide these credential as environment variables::
+Provide these credentials as environment variables::
 
         export RC_APP_ID=<your_app_id>
         export RC_APP_SECRET=<your_app_secret>
