@@ -6,16 +6,14 @@ import asyncio
 import aiohttp
 import websockets
 
-from .api import RC_APP_ID, RC_APP_SECRET, RC_APP_ENDPOINT
-
-RC_APP_ID = os.environ["RC_APP_ID"]
-RC_APP_SECRET = os.environ["RC_APP_SECRET"]
-RC_APP_ENDPOINT = os.environ.get("RC_ENDPOINT", "recurse.rctogether.com")
-
 class WebsocketSubscription:
     async def __aiter__(self):
-        origin = f"https://{RC_APP_ENDPOINT}"
-        url = f"wss://{RC_APP_ENDPOINT}/cable?app_id={RC_APP_ID}&app_secret={RC_APP_SECRET}"
+        rc_app_id = os.environ["RC_APP_ID"]
+        rc_app_secret = os.environ["RC_APP_SECRET"]
+        rc_endpoint = os.environ.get("RC_ENDPOINT", "https://recurse.rctogether.com")
+
+        origin = f"https://{rc_endpoint}"
+        url = f"wss://{rc_endpoint}/cable?app_id={rc_app_id}&app_secret={rc_app_secret}"
 
         async with websockets.connect(url, ssl=True, origin=origin) as connection:
             subscription_identifier = json.dumps({"channel": "ApiChannel"})
