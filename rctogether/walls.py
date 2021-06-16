@@ -1,7 +1,7 @@
 def create(session, bot_id, x=None, y=None, color="gray", wall_text=None):
     return session.post(
         "walls",
-        {"bot_id": bot_id, "x": x, "y": y, "color": color, wall_text: wall_text},
+        {"bot_id": bot_id, "x": x, "y": y, "color": color, "wall_text": wall_text},
     )
 
 
