@@ -1,107 +1,148 @@
-import os
-import asyncio
-import json
 import pytest
-import aiohttp
-import aiohttp.test_utils
-from rctogether import __version__, RestApiSession, bots, messages
+from rctogether import __version__, bots, messages, walls, notes
 
-class CaseControlledTestServer(aiohttp.test_utils.RawTestServer):
-    def __init__(self, **kwargs):
-        super().__init__(self._handle_request, **kwargs)
-        self._requests = asyncio.Queue()
-        self._responses = {}                # {id(request): Future}
+from .fixtures import server, session
 
-    async def close(self):
-        ''' cancel all pending requests before closing '''
-        for future in self._responses.values():
-            future.cancel()
-        await super().close()
-
-    async def _handle_request(self, request):
-        ''' push request to test case and wait until it provides a response '''
-        self._responses[id(request)] = response = asyncio.Future()
-        self._requests.put_nowait(request)
-        try:
-            # wait until test case provides a response
-            return await response
-        finally:
-            del self._responses[id(request)]
-
-    async def receive_request(self):
-        ''' wait until test server receives a request '''
-        return await asyncio.wait_for(self._requests.get(), 3)
-
-    def send_response(self, request, *args, **kwargs):
-        ''' send web response from test case to client code '''
-        response = aiohttp.web.Response(*args, **kwargs)
-        self._responses[id(request)].set_result(response)
-
-    def send_json(self, request, data):
-        self.send_response(request, text=json.dumps(data), content_type="application/json")
-
-@pytest.fixture
-async def server():
-    os.environ['RC_APP_ID'] = "1"
-    os.environ['RC_APP_SECRET'] = "very_secret"
-
-    async with CaseControlledTestServer() as server:
-        os.environ['RC_ENDPOINT'] = f"http://localhost:{server.port}"
-        yield server
-
-@pytest.fixture
-async def session():
-    async with RestApiSession() as session:
-        yield session
-
-
-class RequestContext:
-    def __init__(self, server, coroutine):
-        self.response = asyncio.create_task(coroutine)
-        self.server = server
-
-    async def __aenter__(self):
-        print("Receiving request.")
-        request = await self.server.receive_request()
-        try:
-            assert request.query["app_id"] == "1"
-            assert request.query["app_secret"] == "very_secret"
-        except:
-            self.response.cancel()
-            raise
-        return request
-
-    async def __aexit__(self, exc_type, exc, tb):
-        if exc_type is not None:
-            self.response.cancel()
 
 def test_version():
-    assert __version__ == '0.2.2'
+    assert __version__ == "0.2.2"
+
 
 @pytest.mark.asyncio
 async def test_get_bots(server, session):
-    request_context = RequestContext(server, bots.get(session))
+    request_context = server.create_request(bots.get(session))
     async with request_context as request:
         assert request.method == "GET"
-        assert request.path == '/api/bots'
+        assert request.path == "/api/bots"
 
-        server.send_json(request, [{'emoji': "🐙", 'name': "octopus"}])
-    response = await request_context.response
-    assert response == [{'emoji': "🐙", 'name': "octopus"}]
+        request_context.send_json([{"emoji": "🐙", "name": "octopus"}])
+    assert request_context.response == [{"emoji": "🐙", "name": "octopus"}]
+
+
+@pytest.mark.asyncio
+async def test_create_bot(server, session):
+    async with server.create_request(
+        bots.create(session, name="Octopus", emoji="🐙", x=4, y=5)
+    ) as request:
+        assert request.method == "POST"
+        assert request.path == "/api/bots"
+
+        data = await request.json()
+        assert data == {
+            "bot": {
+                "name": "Octopus",
+                "emoji": "🐙",
+                "x": 4,
+                "y": 5,
+                "direction": "right",
+                "can_be_mentioned": False,
+            }
+        }
+
+
+@pytest.mark.asyncio
+async def test_update_bot(server, session):
+    async with server.create_request(
+        bots.update(session, 5, {"x": 1, "y": 2})
+    ) as request:
+        assert request.method == "PATCH"
+        assert request.path == "/api/bots/5"
+
+        data = await request.json()
+        assert data == {"bot": {"x": 1, "y": 2}}
+
+
+@pytest.mark.asyncio
+async def test_delete_bot(server, session):
+    request_context = server.create_request(bots.delete(session, 17))
+    async with request_context as request:
+        assert request.method == "DELETE"
+        assert request.path == "/api/bots/17"
+
+
+@pytest.mark.asyncio
+async def test_create_wall(server, session):
+    async with server.create_request(
+        walls.create(session, 18, x=1, y=2, color="blue", wall_text="!")
+    ) as request:
+        assert request.method == "POST"
+        assert request.path == "/api/walls"
+
+        data = await request.json()
+        assert data == {"bot_id": 18, "x": 1, "y": 2, "color": "blue", "wall_text": "!"}
+
+
+@pytest.mark.asyncio
+async def test_update_wall(server, session):
+    async with server.create_request(
+        walls.update(session, 18, 12, wall_text="?")
+    ) as request:
+        assert request.method == "PATCH"
+        assert request.path == "/api/walls/12"
+
+        data = await request.json()
+        assert data == {"bot_id": 18, "wall_text": "?", "color": None}
+
+
+@pytest.mark.asyncio
+async def test_delete_wall(server, session):
+    async with server.create_request(
+        walls.delete(session, bot_id=18, wall_id=12)
+    ) as request:
+        assert request.method == "DELETE"
+        assert request.path == "/api/walls/12"
+
+        data = await request.json()
+        assert data == {
+            "bot_id": 18,
+        }
+
+
+@pytest.mark.asyncio
+async def test_create_note(server, session):
+    async with server.create_request(
+        notes.create(session, bot_id=18, x=2, y=3, note_text="Hello, world")
+    ) as request:
+        assert request.method == "POST"
+        assert request.path == "/api/notes"
+
+        data = await request.json()
+        assert data == {"bot_id": 18, "x": 2, "y": 3, "note_text": "Hello, world"}
+
+
+@pytest.mark.asyncio
+async def test_update_note(server, session):
+    async with server.create_request(
+        notes.update(session, bot_id=18, note_id=4, note_text="Updated")
+    ) as request:
+        assert request.method == "PATCH"
+        assert request.path == "/api/notes/4"
+
+        data = await request.json()
+        assert data == {"bot_id": 18, "note_text": "Updated"}
+
+
+@pytest.mark.asyncio
+async def test_delete_note(server, session):
+    async with server.create_request(
+        notes.delete(session, bot_id=18, note_id=7)
+    ) as request:
+        assert request.method == "DELETE"
+        assert request.path == "/api/notes/7"
+
+        data = await request.json()
+        assert data == {
+            "bot_id": 18,
+        }
+
 
 @pytest.mark.asyncio
 async def test_send_message(server, session):
-    request_context = RequestContext(server, messages.send(session, 17, "Hello, world"))
-    async with request_context as request:
+    async with server.create_request(
+        messages.send(session, 17, "Hello, world")
+    ) as request:
         assert request.method == "POST"
-        assert request.path == '/api/messages'
+        assert request.path == "/api/messages"
 
         data = await request.json()
-
-        assert data["bot_id"] == 17
-        assert data["text"] == "Hello, world"
-
-        server.send_json(request, [])
-
-    response = await request_context.response
-    assert response == []
+        assert data == {"bot_id": 17, "text": "Hello, world"}
