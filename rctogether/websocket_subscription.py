@@ -1,10 +1,10 @@
-
 import os
 import traceback
 import json
 import asyncio
 import aiohttp
 import websockets
+
 
 class WebsocketSubscription:
     async def __aiter__(self):
@@ -26,7 +26,12 @@ class WebsocketSubscription:
                     pass
                 elif message_type == "welcome":
                     await connection.send(
-                        json.dumps({"command": "subscribe", "identifier": subscription_identifier})
+                        json.dumps(
+                            {
+                                "command": "subscribe",
+                                "identifier": subscription_identifier,
+                            }
+                        )
                     )
                 elif message_type == "confirm_subscription":
                     print("Subscription confirmed.")

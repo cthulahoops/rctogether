@@ -1,15 +1,19 @@
 import os
 import aiohttp
 
+
 class HttpError(Exception):
     pass
+
 
 class RestApiSession:
     def __init__(self):
         self.session = aiohttp.ClientSession()
         self.rc_app_id = os.environ["RC_APP_ID"]
         self.rc_app_secret = os.environ["RC_APP_SECRET"]
-        self.rc_endpoint = os.environ.get("RC_ENDPOINT", "https://recurse.rctogether.com")
+        self.rc_endpoint = os.environ.get(
+            "RC_ENDPOINT", "https://recurse.rctogether.com"
+        )
 
     async def __aenter__(self):
         self.session = await self.session.__aenter__()
@@ -23,7 +27,9 @@ class RestApiSession:
             return await parse_response(response)
 
     async def delete(self, resource, resource_id, json=None):
-        async with self.session.delete(url=self.api_url(resource, resource_id), json=json) as response:
+        async with self.session.delete(
+            url=self.api_url(resource, resource_id), json=json
+        ) as response:
             return await parse_response(response)
 
     async def post(self, resource, json):
@@ -31,7 +37,9 @@ class RestApiSession:
             return await parse_response(response)
 
     async def patch(self, resource, resource_id, json):
-        async with self.session.patch(url=self.api_url(resource, resource_id), json=json) as response:
+        async with self.session.patch(
+            url=self.api_url(resource, resource_id), json=json
+        ) as response:
             return await parse_response(response)
 
     def api_url(self, resource, resource_id=None):
