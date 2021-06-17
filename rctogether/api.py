@@ -7,12 +7,13 @@ class HttpError(Exception):
 
 
 class RestApiSession:
-    def __init__(self):
+    def __init__(self, ssl=True):
         self.session = aiohttp.ClientSession()
+        self.ssl = ssl
         self.rc_app_id = os.environ["RC_APP_ID"]
         self.rc_app_secret = os.environ["RC_APP_SECRET"]
         self.rc_endpoint = os.environ.get(
-            "RC_ENDPOINT", "https://recurse.rctogether.com"
+            "RC_ENDPOINT", "recurse.rctogether.com"
         )
 
     async def __aenter__(self):
@@ -46,7 +47,7 @@ class RestApiSession:
         if resource_id is not None:
             resource = f"{resource}/{resource_id}"
 
-        return f"{self.rc_endpoint}/api/{resource}?app_id={self.rc_app_id}&app_secret={self.rc_app_secret}"
+        return f"{'https' if self.ssl else 'http'}://{self.rc_endpoint}/api/{resource}?app_id={self.rc_app_id}&app_secret={self.rc_app_secret}"
 
 
 async def parse_response(response):

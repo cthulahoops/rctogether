@@ -5,7 +5,7 @@ from .fixtures import server, session
 
 
 def test_version():
-    assert __version__ == "0.3.0"
+    assert __version__ == "0.3.1"
 
 
 @pytest.mark.asyncio

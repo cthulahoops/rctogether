@@ -10,7 +10,7 @@ class WebsocketSubscription:
     async def __aiter__(self):
         rc_app_id = os.environ["RC_APP_ID"]
         rc_app_secret = os.environ["RC_APP_SECRET"]
-        rc_endpoint = os.environ.get("RC_ENDPOINT", "https://recurse.rctogether.com")
+        rc_endpoint = os.environ.get("RC_ENDPOINT", "recurse.rctogether.com")
 
         origin = f"https://{rc_endpoint}"
         url = f"wss://{rc_endpoint}/cable?app_id={rc_app_id}&app_secret={rc_app_secret}"

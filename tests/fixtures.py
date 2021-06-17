@@ -49,13 +49,13 @@ async def server():
     os.environ["RC_APP_SECRET"] = "very_secret"
 
     async with CaseControlledTestServer() as test_server:
-        os.environ["RC_ENDPOINT"] = f"http://localhost:{test_server.port}"
+        os.environ["RC_ENDPOINT"] = f"localhost:{test_server.port}"
         yield test_server
 
 
 @pytest.fixture
 async def session():
-    async with RestApiSession() as test_session:
+    async with RestApiSession(ssl=False) as test_session:
         yield test_session
 
 
