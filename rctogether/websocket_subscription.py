@@ -2,6 +2,9 @@ import os
 import json
 import websockets
 
+# Maximum message size for websocket connections (10MB)
+MAX_WEBSOCKET_MESSAGE_SIZE = 10 * 1024 * 1024
+
 
 class WebsocketSubscription:
     async def __aiter__(self):
@@ -12,7 +15,7 @@ class WebsocketSubscription:
         origin = f"https://{rc_endpoint}"
         url = f"wss://{rc_endpoint}/cable?app_id={rc_app_id}&app_secret={rc_app_secret}"
 
-        async with websockets.connect(url, ssl=True, origin=origin) as connection:
+        async with websockets.connect(url, ssl=True, origin=origin, max_size=MAX_WEBSOCKET_MESSAGE_SIZE) as connection:
             subscription_identifier = json.dumps({"channel": "ApiChannel"})
             async for msg in connection:
                 data = json.loads(msg)

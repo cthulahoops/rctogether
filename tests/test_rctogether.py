@@ -3,7 +3,7 @@ from rctogether import __version__, bots, messages, walls, notes
 
 
 def test_version():
-    assert __version__ == "0.3.3"
+    assert __version__ == "0.3.4"
 
 
 @pytest.mark.asyncio
