@@ -1,8 +1,8 @@
 __version__ = "0.3.3"
 
-from .websocket_subscription import WebsocketSubscription
-from .api import RestApiSession
-from . import bots
-from . import messages
-from . import walls
-from . import notes
+from .websocket_subscription import WebsocketSubscription as WebsocketSubscription
+from .api import RestApiSession as RestApiSession
+from . import bots as bots
+from . import messages as messages
+from . import walls as walls
+from . import notes as notes

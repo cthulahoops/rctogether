@@ -1,8 +1,5 @@
 import os
-import traceback
 import json
-import asyncio
-import aiohttp
 import websockets
 
 
