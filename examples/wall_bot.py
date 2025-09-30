@@ -7,9 +7,10 @@ async def main():
 
         builder = await bots.create(session, name="Bob", emoji="👷", x=160, y=1)
 
-        wall = await walls.create(session, builder["id"], 160, 0, color="gray")
+        wall = await walls.create(session, builder["id"], x=160, y=0)
         print(wall)
-        await walls.update(session, builder["id"], wall["id"], wall_text="!")
+        await asyncio.sleep(5)
+#        await walls.update(session, builder["id"], wall["id"], wall_text="!")
         await walls.delete(session, builder["id"], wall["id"])
 
 

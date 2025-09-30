@@ -2,7 +2,6 @@
 import os
 import asyncio
 import json
-import pytest
 import pytest_asyncio
 import aiohttp
 import aiohttp.test_utils
