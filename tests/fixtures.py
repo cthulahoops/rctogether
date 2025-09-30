@@ -3,6 +3,7 @@ import os
 import asyncio
 import json
 import pytest
+import pytest_asyncio
 import aiohttp
 import aiohttp.test_utils
 from rctogether import RestApiSession
@@ -43,7 +44,7 @@ class CaseControlledTestServer(aiohttp.test_utils.RawTestServer):
         return RequestContext(self, coroutine)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def server():
     os.environ["RC_APP_ID"] = "1"
     os.environ["RC_APP_SECRET"] = "very_secret"
@@ -53,7 +54,7 @@ async def server():
         yield test_server
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def session():
     async with RestApiSession(ssl=False) as test_session:
         yield test_session
