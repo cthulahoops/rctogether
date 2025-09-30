@@ -1,11 +1,9 @@
 import asyncio
 from rctogether import RestApiSession, bots, notes
-from rctogether import WebsocketSubscription
 
 
 async def main():
     async with RestApiSession() as session:
-
         writer = await bots.create(session, name="Bill", emoji="✍️", x=156, y=0)
 
         note = await notes.create(

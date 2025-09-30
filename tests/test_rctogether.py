@@ -1,8 +1,6 @@
 import pytest
 from rctogether import __version__, bots, messages, walls, notes
 
-from .fixtures import server, session
-
 
 def test_version():
     assert __version__ == "0.3.3"
@@ -69,18 +67,21 @@ async def test_create_wall(server, session):
         assert request.path == "/api/walls"
 
         data = await request.json()
-        assert data == {"bot_id": 18, "wall": {"x": 1, "y": 2, "color": "blue", "wall_text": "!"}}
+        assert data == {
+            "bot_id": 18,
+            "wall": {"x": 1, "y": 2, "color": "blue", "wall_text": "!"},
+        }
+
 
 @pytest.mark.asyncio
 async def test_create_wall_defaults(server, session):
-    async with server.create_request(
-        walls.create(session, 18)
-    ) as request:
+    async with server.create_request(walls.create(session, 18)) as request:
         assert request.method == "POST"
         assert request.path == "/api/walls"
 
         data = await request.json()
-        assert data == {"bot_id": 18, "wall": {'color': 'gray'}}
+        assert data == {"bot_id": 18, "wall": {"color": "gray"}}
+
 
 @pytest.mark.asyncio
 async def test_update_wall(server, session):

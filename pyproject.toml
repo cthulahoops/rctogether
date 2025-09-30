@@ -1,19 +1,22 @@
-[tool.poetry]
+[project]
 name = "rctogether"
 version = "0.3.3"
 description = ""
-authors = ["Adam Kelly <adam@cthulahoops.org>"]
-
-[tool.poetry.dependencies]
-python = "^3.8"
-aiohttp = "^3.7.4"
-websockets = "^10.2"
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.1"
-pytest-asyncio = "^0.15.1"
-black = "^21.6b0"
+authors = [{name = "Adam Kelly", email = "adam@cthulahoops.org"}]
+requires-python = ">=3.8"
+dependencies = [
+    "aiohttp>=3.7.4",
+    "websockets>=10.2",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.1",
+    "pytest-asyncio>=0.21.0",
+    "black>=21.6b0",
+    "ruff>=0.13.2",
+]
