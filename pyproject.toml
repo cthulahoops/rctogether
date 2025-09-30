@@ -9,13 +9,14 @@ dependencies = [
     "websockets>=10.2",
 ]
 
-[project.optional-dependencies]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
 dev = [
     "pytest>=7.1",
     "pytest-asyncio>=0.21.0",
     "black>=21.6b0",
+    "ruff>=0.13.2",
 ]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
