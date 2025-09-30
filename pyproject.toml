@@ -1,6 +1,6 @@
 [project]
 name = "rctogether"
-version = "0.3.3"
+version = "0.3.4"
 description = ""
 authors = [{name = "Adam Kelly", email = "adam@cthulahoops.org"}]
 requires-python = ">=3.8"
